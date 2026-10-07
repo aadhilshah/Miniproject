@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Companies | BuildEasy</title>
+    <meta name="description"
+        content="Search construction material suppliers by name, location, pincode or proximity with BuildEasy.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ══════════════════════════════════════════
+           HERO SECTION
+        ══════════════════════════════════════════ */
+        .nearby-hero {
+            background: linear-gradient(135deg, var(--grey-900) 0%, #1a2744 50%, var(--grey-800) 100%);
+            padding: 120px 0 70px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nearby-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.12), transparent 70%);
+            border-radius: 50%;
+        }
+
+        .nearby-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.07), transparent 70%);
+            border-radius: 50%;
+        }
+
+        .nearby-hero h1 {
+            font-size: clamp(28px, 4vw, 46px);
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nearby-hero h1 .hl {
+            background: linear-gradient(135deg, #fb923c, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nearby-hero p {
+            color: var(--grey-400);
+            font-size: 16px;
+            margin-bottom: 36px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ══════════════════════════════════════════
+           SMART SEARCH PANEL
+        ══════════════════════════════════════════ */
+        .search-panel {
+            max-width: 760px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 28px 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .search-input-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input-wrap .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        #smartSearch {
+            width: 100%;
+            padding: 14px 14px 14px 42px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.25s;
+            box-sizing: border-box;
+        }
+
+        #smartSearch:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+        #smartSearch::placeholder {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .btn-detect {
+            padding: 14px 16px;
+            background: rgba(249, 115, 22, 0.1);
+            color: #f97316;
+            border: 1.5px dashed rgba(249, 115, 22, 0.45);
+            border-radius: 12px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        .btn-detect:hover {
+            background: rgba(249, 115, 22, 0.2);
+        }
+
+        .btn-detect.detected {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-search {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 28px rgba(249, 115, 22, 0.4);
+        }
+
+        /* ── Filter Row ── */
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--grey-400);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            white-space: nowrap;
+        }
+
+        .filter-row select {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-row select:focus {
+            border-color: #f97316;
+        }
+
+        .filter-row select option {
+            background: #1e293b;
+        }
+
+        /* ── Search Mode Badge ── */
+        .search-mode-badge {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .search-mode-badge .badge {
+            background: rgba(249, 115, 22, 0.12);
+            color: #fb923c;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Hint chips ── */
+        .hint-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .hint-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            font-size: 12px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .hint-chip:hover {
+            background: rgba(249, 115, 22, 0.1);
+            border-color: rgba(249, 115, 22, 0.3);
+            color: #fb923c;
+        }
+
+        /* ══════════════════════════════════════════
+           RESULTS SECTION
+        ══════════════════════════════════════════ */
+        .results-section {
+            padding: 60px 0 80px;
+            background: #f8fafc;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .results-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--grey-900);
+        }
+
+        .results-count {
+            font-size: 13px;
+            color: var(--grey-500);
+            font-weight: 500;
+            background: #fff;
+            border: 1px solid var(--grey-200);
+            padding: 5px 14px;
+            border-radius: 20px;
+        }
+
+        /* ── Company Grid ── */
+        .company-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        /* ══════════════════════════════════════════
+           COMPANY CARD
+        ══════════════════════════════════════════ */
+        .company-card {
+            background: var(--white, #fff);
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 24px 22px 20px;
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .company-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #fb923c, #f97316);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .company-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+            border-color: transparent;
+        }
+
+        .company-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .card-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 9px;
+            border-radius: 20px;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+
+        .distance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(249, 115, 22, 0.1);
+            color: #ea580c;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 9px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .company-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .meta {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .meta .meta-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .meta strong {
+            color: #475569;
+            font-weight: 600;
+        }
+
+        /* ── Pincode Tag ── */
+        .pincode-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-family: monospace;
+        }
+
+        /* ── Materials Button ── */
+        .btn-materials {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 16px;
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-materials:hover {
+            box-shadow: 0 5px 18px rgba(249, 115, 22, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* ── Expanded Materials ── */
+        .materials-expand {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f1f5f9;
+            display: none;
+        }
+
+        .materials-expand.open {
+            display: block;
+        }
+
+        .materials-expand h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            margin-bottom: 10px;
+        }
+
+        .mat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f8fafc;
+            font-size: 13px;
+        }
+
+        .mat-item:last-child {
+            border-bottom: none;
+        }
+
+        .mat-item .mat-name {
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .mat-item .mat-price {
+            color: #ea580c;
+            font-weight: 700;
+        }
+
+        /* ── Material type pill on card ── */
+        .mat-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .mat-pill {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+
+        /* ══════════════════════════════════════════
+           EMPTY / LOADING STATE
+        ══════════════════════════════════════════ */
+        .empty-results {
+            text-align: center;
+            padding: 80px 20px;
+            color: #94a3b8;
+            grid-column: 1 / -1;
+        }
+
+        .empty-results .emoji {
+            font-size: 52px;
+            margin-bottom: 16px;
+        }
+
+        .empty-results h3 {
+            font-size: 20px;
+            color: #64748b;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .empty-results p {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        /* ══════════════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════════════ */
+        @media (max-width: 640px) {
+            .search-row {
+                flex-direction: column;
+            }
+
+            .btn-detect,
+            .btn-search {
+                width: 100%;
+                justify-content: center;
+            }
+
+            #smartSearch {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <!-- ══════ HERO ══════ -->
+    <section class="nearby-hero">
+        <div class="container">
+            <h1>Find <span class="hl">Construction Suppliers</span></h1>
+            <p>Search by company name, area, city, pincode — or let us find nearby suppliers automatically</p>
+
+            <div class="search-panel">
+                <!-- Main Search Row -->
+                <div class="search-row">
+                    <div class="search-input-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="smartSearch" placeholder="Search by Company, Location, or Pincode"
+                            autocomplete="off" spellcheck="false">
+                    </div>
+                    <button class="btn-detect" id="btnDetect" onclick="detectLocation()"
+                        title="Detect My Location">📍</button>
+                    <button class="btn-search" onclick="runSearch()">Search</button>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-row">
+                    <span class="filter-label">Filters:</span>
+                    <select id="filterMaterial">
+                        <option value="">All Materials</option>
+                        <option value="Cement">Cement</option>
+                        <option value="Sand">Sand</option>
+                        <option value="Steel">Steel</option>
+                        <option value="Bricks">Bricks</option>
+                        <option value="Aggregate">Aggregate</option>
+                        <option value="Paint">Paint</option>
+                        <option value="Wood">Wood</option>
+                        <option value="Tiles">Tiles</option>
+                    </select>
+                    <select id="filterRadius" title="Proximity radius (used when searching nearby)">
+                        <option value="3000">Within 3 km</option>
+                        <option value="5000" selected>Within 5 km</option>
+                        <option value="10000">Within 10 km</option>
+                        <option value="25000">Within 25 km</option>
+                        <option value="50000">Within 50 km</option>
+                    </select>
+                </div>
+
+                <!-- Search Mode Indicator -->
+                <div class="search-mode-badge" id="searchModeBadge">
+                    <span>Searching as</span>
+                    <span class="badge" id="searchModeText">−</span>
+                </div>
+
+                <!-- Quick Example Chips -->
+                <div class="hint-chips">
+                    <span class="hint-chip" onclick="setSearch('TESS Materials')">🏢 TESS Materials</span>
+                    <span class="hint-chip" onclick="setSearch('T Nagar')">📍 T Nagar</span>
+                    <span class="hint-chip" onclick="setSearch('Chennai')">🌆 Chennai</span>
+                    <span class="hint-chip" onclick="setSearch('600017')">🔢 600017</span>
+                    <span class="hint-chip" onclick="setSearch('')">📡 Nearby</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════ RESULTS ══════ -->
+    <section class="results-section">
+        <div class="container">
+            <div class="results-header">
+                <h2 id="resultsHeading">Search Results</h2>
+                <span class="results-count" id="resultsCount" style="display:none"></span>
+            </div>
+            <div id="resultsGrid" class="company-grid">
+                <div class="empty-results">
+                    <div class="emoji">🏗️</div>
+                    <h3>Search for suppliers</h3>
+                    <p>Type a company name, area, city, or pincode — or click 📍 to find nearby suppliers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="navbar-loader.js"></script>
+    <script src="nearby.js"></script>
+</body>
+
+</html>
